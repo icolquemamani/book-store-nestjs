@@ -5,10 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RoleRepository } from './role.repository';
-import { MapperService } from '../../shared/mapper.service';
 import { Role } from './role.entity';
-import { getConnection } from 'typeorm';
-
 @Injectable()
 export class RoleService {
   constructor(
