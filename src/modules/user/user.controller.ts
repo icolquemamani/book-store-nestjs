@@ -11,11 +11,13 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../role/decorators/role.decorator';
-import { UserDto } from './dto/user.dto';
+import { UserDto } from './dtos/user.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import { RoleGuard } from '../role/guards/role.guard';
 import { RoleType } from '../role/roletype.enum';
+import { ReadUserDto } from './dtos/read-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Controller('users')
 export class UserController {
@@ -24,43 +26,34 @@ export class UserController {
   @Get(':id')
   // @Roles(RoleType.ADMIN, RoleType.GENERAL)
   // @UseGuards(AuthGuard(), RoleGuard)
-  async getUser(@Param('id', ParseIntPipe) id: number) {
-    const user = await this._userService.get(id);
-    return user;
+  getUser(@Param('id', ParseIntPipe) id: number): Promise<ReadUserDto> {
+    return this._userService.get(id);
   }
 
   @UseGuards(AuthGuard())
   @Get()
-  async getUsers(): Promise<User[]> {
-    const users = await this._userService.getAll();
-    return users;
+  getUsers(): Promise<ReadUserDto[]> {
+    return this._userService.getAll();
   }
 
-  @Post()
-  async createUser(@Body() user: User): Promise<User> {
-    const createdUser = await this._userService.create(user);
-    return createdUser;
-  }
-
-  @Patch(':id')
-  async updateUser(
-    @Param('id', ParseIntPipe) id: number,
+  @Patch(':userId')
+  updateUser(
+    @Param('userId', ParseIntPipe) userId: number,
     @Body() user: User,
-  ): Promise<any> {
-    const updatedUser = await this._userService.update(id, user);
-    return updatedUser;
+  ): Promise<UpdateUserDto> {
+    return this._userService.update(userId, user);
   }
 
-  @Delete(':id')
-  async deleteUser(@Param('id', ParseIntPipe) id: number) {
-    await this._userService.delete(id);
+  @Delete(':userId')
+  deleteUser(@Param('userId', ParseIntPipe) userId: number): Promise<void> {
+    return this._userService.delete(userId);
   }
 
   @Post('setRole/:userId/:roleId')
-  async setRoleUser(
+  setRoleUser(
     @Param('userId', ParseIntPipe) userId: number,
     @Param('roleId', ParseIntPipe) roleId: number,
-  ) {
-    await this._userService.setRoleUser(userId, roleId);
+  ): Promise<boolean> {
+    return this._userService.setRoleUser(userId, roleId);
   }
 }
